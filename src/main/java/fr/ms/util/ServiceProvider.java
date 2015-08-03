@@ -33,5 +33,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface ServiceProvider {
 
-    Class[] value() default Object.class;
+    Class<?>[] value() default Object.class;
 }

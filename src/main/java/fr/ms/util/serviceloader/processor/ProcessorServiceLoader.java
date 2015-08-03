@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -36,6 +37,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypesException;
 import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic.Kind;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
@@ -66,6 +68,9 @@ public class ProcessorServiceLoader extends AbstractProcessor {
 	    return false;
 	}
 
+	final Messager messager = processingEnv.getMessager();
+
+	boolean error = false;
 	for (final Element element : elements) {
 
 	    final String impl = element.toString();
@@ -78,48 +83,60 @@ public class ProcessorServiceLoader extends AbstractProcessor {
 		    if (findInterfaces.size() == 1) {
 			addInterface(findInterfaces.iterator().next(), impl);
 		    } else {
-			throw new ServiceLoaderAnnotationException(impl + "implémente plusieurs interfaces, vous devez les définir vous même dans l'annotation");
+			messager.printMessage(Kind.ERROR, impl + "implement many interfaces, add Value parameter into annotation ServiceProvider");
+			error = true;
 		    }
 		} else {
 		    for (final String annotationValue : annotationValues) {
 			if (findInterfaces.contains(annotationValue)) {
 			    addInterface(annotationValue, impl);
 			} else {
-			    throw new ServiceLoaderAnnotationException(impl + " implémente pas l'interface " + annotationValue + " définie dans l'annotation");
+			    messager.printMessage(Kind.ERROR, impl + " not implement " + annotationValue + " interface define annotation ServiceProvider");
+			    error = true;
 			}
 		    }
 		}
 	    }
 	}
 
+	if (error) {
+	    return true;
+	}
+
 	final Filer filer = processingEnv.getFiler();
 
-	for (final Map.Entry<String, List<String>> service : services.entrySet()) {
-	    final String serviceFile = service.getKey();
-	    try {
-		final FileObject fo = filer.createResource(StandardLocation.CLASS_OUTPUT, "", PREFIX + serviceFile);
-
-		Writer openWriter = null;
-		BufferedWriter bw = null;
+	if (!services.isEmpty()) {
+	    messager.printMessage(Kind.NOTE, "Service Provider detected");
+	    for (final Map.Entry<String, List<String>> service : services.entrySet()) {
+		messager.printMessage(Kind.NOTE, "************************************");
+		final String serviceFile = service.getKey();
+		messager.printMessage(Kind.NOTE, "Interface : " + serviceFile);
 		try {
-		    openWriter = fo.openWriter();
-		    bw = new BufferedWriter(openWriter);
-		    final List<String> interfacesDeclare = service.getValue();
-		    for (final String interfaceDeclare : interfacesDeclare) {
-			bw.append(interfaceDeclare);
+		    final FileObject fo = filer.createResource(StandardLocation.CLASS_OUTPUT, "", PREFIX + serviceFile);
+
+		    Writer openWriter = null;
+		    BufferedWriter bw = null;
+		    try {
+			openWriter = fo.openWriter();
+			bw = new BufferedWriter(openWriter);
+			final List<String> interfacesDeclare = service.getValue();
+			for (final String interfaceDeclare : interfacesDeclare) {
+			    messager.printMessage(Kind.NOTE, "                -> " + interfaceDeclare);
+			    bw.write(interfaceDeclare);
+			    bw.newLine();
+			}
+		    } finally {
+			if (bw != null) {
+			    bw.close();
+			}
+			if (openWriter != null) {
+			    openWriter.close();
+			}
 		    }
 
-		} finally {
-		    if (bw != null) {
-			bw.close();
-		    }
-		    if (openWriter != null) {
-			openWriter.close();
-		    }
+		} catch (final IOException e) {
+		    throw new RuntimeException(e);
 		}
-
-	    } catch (final IOException e) {
-		throw new RuntimeException(e);
 	    }
 	}
 
