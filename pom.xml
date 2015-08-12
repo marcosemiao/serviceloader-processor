@@ -4,11 +4,11 @@
 
 	<groupId>com.github.marcosemiao.serviceloader</groupId>
 	<artifactId>serviceloader-processor</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
 
 	<name>Service Loader Processor</name>
 
-	<url>https://github.com/marcosemiao/openjpa-ws-db2-rownumber</url>
+	<url>https://github.com/marcosemiao/serviceloader-processor</url>
 
 	<licenses>
 		<license>
