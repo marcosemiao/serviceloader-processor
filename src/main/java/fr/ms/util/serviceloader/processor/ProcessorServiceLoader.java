@@ -83,7 +83,8 @@ public class ProcessorServiceLoader extends AbstractProcessor {
 		    if (findInterfaces.size() == 1) {
 			addInterface(findInterfaces.iterator().next(), impl);
 		    } else {
-			messager.printMessage(Kind.ERROR, impl + "implement many interfaces, add Value parameter into annotation ServiceProvider");
+			messager.printMessage(Kind.ERROR, impl
+				+ " implements many interfaces, please define the interfaces in the ServiceProvider annotation");
 			error = true;
 		    }
 		} else {
@@ -91,7 +92,8 @@ public class ProcessorServiceLoader extends AbstractProcessor {
 			if (findInterfaces.contains(annotationValue)) {
 			    addInterface(annotationValue, impl);
 			} else {
-			    messager.printMessage(Kind.ERROR, impl + " not implement " + annotationValue + " interface define annotation ServiceProvider");
+			    messager.printMessage(Kind.ERROR, impl + " does not implement " + annotationValue
+				    + " interface defined in the ServiceProvider annotation");
 			    error = true;
 			}
 		    }
