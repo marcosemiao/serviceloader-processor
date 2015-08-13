@@ -1,1 +1,1 @@
-fr.ms.util.serviceloader.processor.ProcessorServiceLoader
+fr.ms.annotation.processing.ServiceProviderProcessor

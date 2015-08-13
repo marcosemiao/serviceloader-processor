@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package fr.ms.util.serviceloader.processor;
+package fr.ms.annotation.processing;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -41,7 +41,7 @@ import javax.tools.Diagnostic.Kind;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
-import fr.ms.model.ClassElementVisitor;
+import fr.ms.lang.model.ClassElementVisitor;
 import fr.ms.util.ServiceProvider;
 
 /**
@@ -54,7 +54,7 @@ import fr.ms.util.ServiceProvider;
  */
 @SupportedAnnotationTypes("fr.ms.util.ServiceProvider")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
-public class ProcessorServiceLoader extends AbstractProcessor {
+public class ServiceProviderProcessor extends AbstractProcessor {
 
     private static final String PREFIX = "META-INF/services/";
 
