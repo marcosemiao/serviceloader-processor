@@ -42,7 +42,7 @@ import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
 import fr.ms.lang.model.ClassElementVisitor;
-import fr.ms.util.ServiceProvider;
+import fr.ms.util.ServiceLoader;
 
 /**
  *
@@ -52,9 +52,9 @@ import fr.ms.util.ServiceProvider;
  * @author Marco Semiao
  *
  */
-@SupportedAnnotationTypes("fr.ms.util.ServiceProvider")
+@SupportedAnnotationTypes("fr.ms.util.ServiceLoader")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
-public class ServiceProviderProcessor extends AbstractProcessor {
+public class ServiceLoaderProcessor extends AbstractProcessor {
 
     private static final String PREFIX = "META-INF/services/";
 
@@ -62,7 +62,7 @@ public class ServiceProviderProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
-	final Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(ServiceProvider.class);
+	final Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(ServiceLoader.class);
 
 	if (elements == null || elements.isEmpty()) {
 	    return false;
@@ -169,7 +169,7 @@ public class ServiceProviderProcessor extends AbstractProcessor {
     private Set<String> getAnnotationValues(final Element element) {
 	final Set<String> values = new HashSet<String>();
 
-	final ServiceProvider annotation = element.getAnnotation(ServiceProvider.class);
+	final ServiceLoader annotation = element.getAnnotation(ServiceLoader.class);
 
 	try {
 	    annotation.value();
