@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.marcosemiao.serviceloader</groupId>
+	<groupId>com.github.marcosemiao</groupId>
 	<artifactId>serviceloader-processor</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
