@@ -84,7 +84,7 @@ public class ServiceLoaderProcessor extends AbstractProcessor {
 			addInterface(findInterfaces.iterator().next(), impl);
 		    } else {
 			messager.printMessage(Kind.ERROR, impl
-				+ " implements many interfaces, please define the interfaces in the ServiceProvider annotation");
+				+ " implements many interfaces, please define the interface in the ServiceProvider annotation");
 			error = true;
 		    }
 		} else {
