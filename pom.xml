@@ -3,7 +3,7 @@
 
 	<groupId>com.github.marcosemiao</groupId>
 	<artifactId>serviceloader-processor</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 
 	<name>Service Loader Processor</name>
 
@@ -30,7 +30,7 @@
 		<connection>scm:git:git@github.com:marcosemiao/serviceloader-processor.git</connection>
 		<developerConnection>scm:git:git@github.com:marcosemiao/serviceloader-processor.git</developerConnection>
 		<url>https://github.com/marcosemiao/serviceloader-processor</url>
-		<tag>HEAD</tag>
+		<tag>serviceloader-processor-0.0.1</tag>
 	</scm>
 
 	<distributionManagement>
