@@ -3,9 +3,11 @@
 
 	<groupId>com.github.marcosemiao</groupId>
 	<artifactId>serviceloader-processor</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
 
 	<name>Service Loader Processor</name>
+
+	<description>Service Loader Processor is a Java Processor to generate a provider-configuration file</description>
 
 	<url>https://github.com/marcosemiao/serviceloader-processor</url>
 
