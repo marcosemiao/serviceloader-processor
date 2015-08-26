@@ -5,7 +5,7 @@ Cette librairie permet de générer pour un fournisseur de service, un fichier d
 
 - Facile d'utilisation, il suffit de rajouter la dépendance Maven avec le scope "**provided**" dans votre application.
 - Disponible sur le repository central de Maven.
-- Utilisable à partir de Java 6
+- Compatible à partir de la version Java 6.
 
 
 ## Utilisation rapide
