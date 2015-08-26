@@ -1,9 +1,9 @@
 # Service Loader Processor
 
 ## Fonctionnalités générales
-Cette librairie permet de générer pour un fournisseur de service, un fichier de configuration dans le répertoire "META-INF/services" à partir d'une annotation.
+Cette librairie permet de générer pour un fournisseur de service, un fichier de configuration dans le répertoire "**META-INF/services**" à partir d'une annotation.
 
-- Facile d'utilisation, il suffit de rajouter la dépendance Maven avec le scope "provided" dans votre application.
+- Facile d'utilisation, il suffit de rajouter la dépendance Maven avec le scope "**provided**" dans votre application.
 - Disponible sur le repository central de Maven.
 
 
@@ -20,13 +20,13 @@ Cette librairie permet de générer pour un fournisseur de service, un fichier d
 </dependency>
 ````
 
-- Dans votre implémentation rajouter l'annotation "ServiceLoader" à la compilation le fichier de configuration sera automatiquement crée dans le répertoire "META-INF/services".
+- Dans votre implémentation rajouter l'annotation "**ServiceLoader**" à la compilation le fichier de configuration sera automatiquement crée dans le répertoire "**META-INF/services**".
 
 Exemple :
 
-Avec une classe "Slf4jMojoLogger" qui implémente une interface MojoLogger
+Avec une classe "**Slf4jMojoLogger**" qui implémente une interface "**MojoLogger**"
 
-il suffit de rajouter l'annotation "ServiceLoader" sur cette classe.
+il suffit de rajouter l'annotation "**ServiceLoader**" sur cette classe.
 ````java
 @ServiceLoader
 public class Slf4jMojoLogger implements MojoLogger {
@@ -48,7 +48,7 @@ A la compilation, un message previent de la détection d'une implémentation :
 [INFO]                 -> fr.ms.maven.slf4j.impl.Slf4jMojoLogger
 ````
 
-A la suite de cela le fichier "META-INF/services/fr.ms.maven.plugin.MojoLogger" est crée avec le contenu suivant :
+A la suite de cela le fichier "**META-INF/services/fr.ms.maven.plugin.MojoLogger**" est crée avec le contenu suivant :
 ````
 fr.ms.maven.slf4j.impl.Slf4jMojoLogger
 ````
@@ -101,4 +101,17 @@ A la compilation, un message previent de la détection de plusieurs implémentat
 [INFO] ************************************
 [INFO] Interface : fr.ms.maven.plugin.Dummy
 [INFO]                 -> fr.ms.maven.slf4j.impl.Slf4jMojoLogger
+````
+
+A la suite de cela deux fichiers sont crées :
+"**META-INF/services/fr.ms.maven.plugin.MojoLogger**" est crée avec le contenu suivant :
+````
+fr.ms.maven.slf4j.impl.Slf4jMojoLogger
+````
+
+et
+
+"**META-INF/services/fr.ms.maven.plugin.Dummy**" est crée avec le contenu suivant :
+````
+fr.ms.maven.slf4j.impl.Slf4jMojoLogger
 ````
