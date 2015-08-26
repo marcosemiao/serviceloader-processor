@@ -41,10 +41,12 @@ public class Slf4jMojoLogger implements MojoLogger {
 ````
 
 A la compilation, un message previent de la détection d'une implémentation :
+````
 [INFO] Service Provider detected
 [INFO] ************************************
 [INFO] Interface : fr.ms.maven.plugin.MojoLogger
 [INFO]                 -> fr.ms.maven.slf4j.impl.Slf4jMojoLogger
+````
 
 A la suite de cela le fichier "META-INF/services/fr.ms.maven.plugin.MojoLogger" est crée avec le contenu suivant :
 ````
@@ -71,7 +73,9 @@ public class Slf4jMojoLogger implements MojoLogger, Dummy {
 ````
 
 A la compilation, un message d'erreur previent de l'utilisation de plusieurs interfaces :
+````
 [ERROR] fr.ms.maven.slf4j.impl.Slf4jMojoLogger implements many interfaces, please define the interface in the ServiceProvider annotation
+````
 
 Il est donc nécessaire de spécifier la ou les interfaces à utiliser 
 
@@ -89,6 +93,7 @@ public class Slf4jMojoLogger implements MojoLogger, Serializable {
 ````
 
 A la compilation, un message previent de la détection de plusieurs implémentations :
+````
 [INFO] Service Provider detected
 [INFO] ************************************
 [INFO] Interface : fr.ms.maven.plugin.MojoLogger
@@ -96,3 +101,4 @@ A la compilation, un message previent de la détection de plusieurs implémentat
 [INFO] ************************************
 [INFO] Interface : fr.ms.maven.plugin.Dummy
 [INFO]                 -> fr.ms.maven.slf4j.impl.Slf4jMojoLogger
+````
