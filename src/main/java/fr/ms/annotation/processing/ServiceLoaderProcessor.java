@@ -174,7 +174,8 @@ public class ServiceLoaderProcessor extends AbstractProcessor {
 	    annotation.value();
 	} catch (final MirroredTypesException mte) {
 	    final List<? extends TypeMirror> typeMirrors = mte.getTypeMirrors();
-	    for (final TypeMirror typeMirror : typeMirrors) {
+	    for (TypeMirror typeMirror : typeMirrors) {
+		typeMirror = processingEnv.getTypeUtils().erasure(typeMirror);
 		final String inter = typeMirror.toString();
 		if (!"java.lang.Object".equals(inter)) {
 		    values.add(inter);

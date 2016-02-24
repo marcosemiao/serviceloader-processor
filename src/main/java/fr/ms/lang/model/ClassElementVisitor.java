@@ -55,10 +55,10 @@ public class ClassElementVisitor extends SimpleElementVisitor6<Void, Void> {
 	final List<? extends TypeMirror> interfacesType = typeElement.getInterfaces();
 
 	if (interfacesType != null && !interfacesType.isEmpty()) {
-	    for (final TypeMirror typeMirror : interfacesType) {
-		final TypeMirror interfaceWithoutGeneric = processingEnv.getTypeUtils().erasure(typeMirror);
+	    for (TypeMirror typeMirror : interfacesType) {
+		typeMirror = processingEnv.getTypeUtils().erasure(typeMirror);
 
-		interfaces.add(interfaceWithoutGeneric.toString());
+		interfaces.add(typeMirror.toString());
 	    }
 	}
 
