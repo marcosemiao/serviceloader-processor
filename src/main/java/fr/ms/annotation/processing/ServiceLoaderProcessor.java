@@ -83,8 +83,7 @@ public class ServiceLoaderProcessor extends AbstractProcessor {
 		    if (findInterfaces.size() == 1) {
 			addInterface(findInterfaces.iterator().next(), impl);
 		    } else {
-			messager.printMessage(Kind.ERROR, impl
-				+ " implements many interfaces, please define the interface in the ServiceProvider annotation");
+			messager.printMessage(Kind.ERROR, impl + " implements many interfaces, please define the interface in the ServiceProvider annotation");
 			error = true;
 		    }
 		} else {
@@ -158,7 +157,7 @@ public class ServiceLoaderProcessor extends AbstractProcessor {
 
     private Set<String> findInterfaces(final Element element) {
 
-	final ClassElementVisitor elementVisitor = new ClassElementVisitor();
+	final ClassElementVisitor elementVisitor = new ClassElementVisitor(processingEnv);
 	element.accept(elementVisitor, null);
 
 	final Set<String> interfaces = elementVisitor.getInterfaces();

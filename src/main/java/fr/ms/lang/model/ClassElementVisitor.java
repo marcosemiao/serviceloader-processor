@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.SimpleElementVisitor6;
@@ -35,7 +36,13 @@ import javax.lang.model.util.SimpleElementVisitor6;
  */
 public class ClassElementVisitor extends SimpleElementVisitor6<Void, Void> {
 
+    private final ProcessingEnvironment processingEnv;
+
     private final Set<String> interfaces = new HashSet<String>();
+
+    public ClassElementVisitor(final ProcessingEnvironment processingEnv) {
+	this.processingEnv = processingEnv;
+    }
 
     @Override
     public Void visitType(final TypeElement typeElement, final Void type) {
@@ -49,14 +56,16 @@ public class ClassElementVisitor extends SimpleElementVisitor6<Void, Void> {
 
 	if (interfacesType != null && !interfacesType.isEmpty()) {
 	    for (final TypeMirror typeMirror : interfacesType) {
-		interfaces.add(typeMirror.toString());
+		final TypeMirror interfaceWithoutGeneric = processingEnv.getTypeUtils().erasure(typeMirror);
+
+		interfaces.add(interfaceWithoutGeneric.toString());
 	    }
 	}
 
 	final TypeMirror superClassType = typeElement.getSuperclass();
 
 	if (superClassType != null) {
-	    final ClassTypeVisitor typeVisitor = new ClassTypeVisitor();
+	    final ClassTypeVisitor typeVisitor = new ClassTypeVisitor(processingEnv);
 	    superClassType.accept(typeVisitor, null);
 	    final Set<String> superClassInterfaces = typeVisitor.getInterfaces();
 	    interfaces.addAll(superClassInterfaces);

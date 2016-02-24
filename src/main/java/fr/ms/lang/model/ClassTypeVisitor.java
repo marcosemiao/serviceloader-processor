@@ -18,6 +18,7 @@ package fr.ms.lang.model;
 
 import java.util.Set;
 
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.SimpleTypeVisitor6;
@@ -32,7 +33,11 @@ import javax.lang.model.util.SimpleTypeVisitor6;
  */
 public class ClassTypeVisitor extends SimpleTypeVisitor6<Void, Void> {
 
-    private final ClassElementVisitor elementVisitor = new ClassElementVisitor();
+    private final ClassElementVisitor elementVisitor;
+
+    public ClassTypeVisitor(final ProcessingEnvironment processingEnv) {
+	elementVisitor = new ClassElementVisitor(processingEnv);
+    }
 
     @Override
     public Void visitDeclared(final DeclaredType declaredType, final Void type) {
