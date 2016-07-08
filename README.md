@@ -17,7 +17,7 @@ Cette librairie permet de générer pour un fournisseur de service, un fichier d
 	<groupId>com.github.marcosemiao</groupId>
 	<artifactId>serviceloader-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 </dependency>
 ````
 
