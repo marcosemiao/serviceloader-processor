@@ -3,7 +3,7 @@
 
 	<groupId>com.github.marcosemiao</groupId>
 	<artifactId>serviceloader-processor</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 
 	<name>Service Loader Processor</name>
 
