@@ -17,7 +17,7 @@ Cette librairie permet de générer pour un fournisseur de service, un fichier d
 	<groupId>com.github.marcosemiao</groupId>
 	<artifactId>serviceloader-processor</artifactId>
     <scope>provided</scope>
-    <version>0.0.2</version>
+    <version>0.0.6</version>
 </dependency>
 ````
 
@@ -116,3 +116,5 @@ et
 ````
 fr.ms.maven.slf4j.impl.Slf4jMojoLogger
 ````
+
+PS : Vous pouvez spécifier des super classes à la place des interfaces

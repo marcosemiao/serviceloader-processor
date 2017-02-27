@@ -33,29 +33,29 @@ import javax.lang.model.util.SimpleTypeVisitor6;
  */
 public class ClassTypeVisitor extends SimpleTypeVisitor6<Void, Void> {
 
-    private final ClassElementVisitor elementVisitor;
+	private final ClassElementVisitor elementVisitor;
 
-    public ClassTypeVisitor(final ProcessingEnvironment processingEnv) {
-	elementVisitor = new ClassElementVisitor(processingEnv);
-    }
-
-    @Override
-    public Void visitDeclared(final DeclaredType declaredType, final Void type) {
-	visitDeclared(declaredType);
-
-	return defaultAction(declaredType, type);
-    }
-
-    private void visitDeclared(final DeclaredType declaredType) {
-	if (declaredType != null) {
-	    final Element element = declaredType.asElement();
-	    if (element != null) {
-		element.accept(elementVisitor, null);
-	    }
+	public ClassTypeVisitor(final ProcessingEnvironment processingEnv) {
+		elementVisitor = new ClassElementVisitor(processingEnv);
 	}
-    }
 
-    public Set<String> getInterfaces() {
-	return elementVisitor.getInterfaces();
-    }
+	@Override
+	public Void visitDeclared(final DeclaredType declaredType, final Void type) {
+		visitDeclared(declaredType);
+
+		return defaultAction(declaredType, type);
+	}
+
+	private void visitDeclared(final DeclaredType declaredType) {
+		if (declaredType != null) {
+			final Element element = declaredType.asElement();
+			if (element != null) {
+				element.accept(elementVisitor, null);
+			}
+		}
+	}
+
+	public Set<String> getInterfaces() {
+		return elementVisitor.getInterfaces();
+	}
 }

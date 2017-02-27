@@ -36,43 +36,50 @@ import javax.lang.model.util.SimpleElementVisitor6;
  */
 public class ClassElementVisitor extends SimpleElementVisitor6<Void, Void> {
 
-    private final ProcessingEnvironment processingEnv;
+	private final ProcessingEnvironment processingEnv;
 
-    private final Set<String> interfaces = new HashSet<String>();
+	private final Set<String> interfaces = new HashSet<String>();
 
-    public ClassElementVisitor(final ProcessingEnvironment processingEnv) {
-	this.processingEnv = processingEnv;
-    }
+	private final Set<String> superClasses = new HashSet<String>();
 
-    @Override
-    public Void visitType(final TypeElement typeElement, final Void type) {
-	visitType(typeElement);
-
-	return super.visitType(typeElement, type);
-    }
-
-    private void visitType(final TypeElement typeElement) {
-	final List<? extends TypeMirror> interfacesType = typeElement.getInterfaces();
-
-	if (interfacesType != null && !interfacesType.isEmpty()) {
-	    for (TypeMirror typeMirror : interfacesType) {
-		typeMirror = processingEnv.getTypeUtils().erasure(typeMirror);
-
-		interfaces.add(typeMirror.toString());
-	    }
+	public ClassElementVisitor(final ProcessingEnvironment processingEnv) {
+		this.processingEnv = processingEnv;
 	}
 
-	final TypeMirror superClassType = typeElement.getSuperclass();
+	@Override
+	public Void visitType(final TypeElement typeElement, final Void type) {
+		visitType(typeElement);
 
-	if (superClassType != null) {
-	    final ClassTypeVisitor typeVisitor = new ClassTypeVisitor(processingEnv);
-	    superClassType.accept(typeVisitor, null);
-	    final Set<String> superClassInterfaces = typeVisitor.getInterfaces();
-	    interfaces.addAll(superClassInterfaces);
+		return super.visitType(typeElement, type);
 	}
-    }
 
-    public Set<String> getInterfaces() {
-	return Collections.unmodifiableSet(interfaces);
-    }
+	private void visitType(final TypeElement typeElement) {
+		final List<? extends TypeMirror> interfacesType = typeElement.getInterfaces();
+
+		if (interfacesType != null && !interfacesType.isEmpty()) {
+			for (TypeMirror typeMirror : interfacesType) {
+				typeMirror = processingEnv.getTypeUtils().erasure(typeMirror);
+
+				interfaces.add(typeMirror.toString());
+			}
+		}
+
+		final TypeMirror superClassType = typeElement.getSuperclass();
+
+		if (superClassType != null && !"java.lang.Object".equals(superClassType.toString())) {
+			superClasses.add(superClassType.toString());
+			final ClassTypeVisitor typeVisitor = new ClassTypeVisitor(processingEnv);
+			superClassType.accept(typeVisitor, null);
+			final Set<String> superClassInterfaces = typeVisitor.getInterfaces();
+			interfaces.addAll(superClassInterfaces);
+		}
+	}
+
+	public Set<String> getInterfaces() {
+		return Collections.unmodifiableSet(interfaces);
+	}
+
+	public Set<String> getSuperClasses() {
+		return Collections.unmodifiableSet(superClasses);
+	}
 }

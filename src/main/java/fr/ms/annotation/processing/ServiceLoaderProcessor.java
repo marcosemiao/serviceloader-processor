@@ -56,133 +56,133 @@ import fr.ms.util.ServiceLoader;
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class ServiceLoaderProcessor extends AbstractProcessor {
 
-    private static final String PREFIX = "META-INF/services/";
+	private static final String PREFIX = "META-INF/services/";
 
-    private final Map<String, List<String>> services = new HashMap<String, List<String>>();
+	private final Map<String, List<String>> services = new HashMap<String, List<String>>();
 
-    @Override
-    public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
-	final Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(ServiceLoader.class);
+	@Override
+	public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
+		final Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(ServiceLoader.class);
 
-	if (elements == null || elements.isEmpty()) {
-	    return false;
-	}
-
-	final Messager messager = processingEnv.getMessager();
-
-	boolean error = false;
-	for (final Element element : elements) {
-
-	    final String impl = element.toString();
-	    final Set<String> findInterfaces = findInterfaces(element);
-
-	    final Set<String> annotationValues = getAnnotationValues(element);
-
-	    if (findInterfaces != null && !findInterfaces.isEmpty()) {
-		if (annotationValues == null || annotationValues.isEmpty()) {
-		    if (findInterfaces.size() == 1) {
-			addInterface(findInterfaces.iterator().next(), impl);
-		    } else {
-			messager.printMessage(Kind.ERROR, impl + " implements many interfaces, please define the interface in the ServiceProvider annotation");
-			error = true;
-		    }
-		} else {
-		    for (final String annotationValue : annotationValues) {
-			if (findInterfaces.contains(annotationValue)) {
-			    addInterface(annotationValue, impl);
-			} else {
-			    messager.printMessage(Kind.ERROR, impl + " does not implement " + annotationValue
-				    + " interface defined in the ServiceProvider annotation");
-			    error = true;
-			}
-		    }
+		if (elements == null || elements.isEmpty()) {
+			return false;
 		}
-	    }
+
+		final Messager messager = processingEnv.getMessager();
+
+		boolean error = false;
+		for (final Element element : elements) {
+
+			final String impl = element.toString();
+			final ClassElementVisitor classElement = classElement(element);
+			final Set<String> findInterfaces = classElement.getInterfaces();
+			final Set<String> findSuperClasses = classElement.getSuperClasses();
+			final Set<String> annotationValues = getAnnotationValues(element);
+
+			if (findInterfaces != null && !findInterfaces.isEmpty()) {
+				if (annotationValues == null || annotationValues.isEmpty()) {
+					if (findInterfaces.size() == 1) {
+						addInterface(findInterfaces.iterator().next(), impl);
+					} else {
+						messager.printMessage(Kind.ERROR, impl
+								+ " implements many interfaces, please define the interface in the ServiceProvider annotation");
+						error = true;
+					}
+				} else {
+					for (final String annotationValue : annotationValues) {
+						if (findInterfaces.contains(annotationValue) || findSuperClasses.contains(annotationValue)) {
+							addInterface(annotationValue, impl);
+						} else {
+							messager.printMessage(Kind.ERROR, impl + " does not implement " + annotationValue
+									+ " interface defined in the ServiceProvider annotation");
+							error = true;
+						}
+					}
+				}
+			}
+		}
+
+		if (error) {
+			return true;
+		}
+
+		final Filer filer = processingEnv.getFiler();
+
+		if (!services.isEmpty()) {
+			messager.printMessage(Kind.NOTE, "Service Provider detected");
+			for (final Map.Entry<String, List<String>> service : services.entrySet()) {
+				messager.printMessage(Kind.NOTE, "************************************");
+				final String serviceFile = service.getKey();
+				messager.printMessage(Kind.NOTE, "Interface/SuperClass : " + serviceFile);
+				try {
+					final FileObject fo = filer.createResource(StandardLocation.CLASS_OUTPUT, "", PREFIX + serviceFile);
+
+					Writer openWriter = null;
+					BufferedWriter bw = null;
+					try {
+						openWriter = fo.openWriter();
+						bw = new BufferedWriter(openWriter);
+						final List<String> interfacesDeclare = service.getValue();
+						for (final String interfaceDeclare : interfacesDeclare) {
+							messager.printMessage(Kind.NOTE, "                -> " + interfaceDeclare);
+							bw.write(interfaceDeclare);
+							bw.newLine();
+						}
+					} finally {
+						if (bw != null) {
+							bw.close();
+						}
+						if (openWriter != null) {
+							openWriter.close();
+						}
+					}
+
+				} catch (final IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+
+		return true;
 	}
 
-	if (error) {
-	    return true;
+	private void addInterface(final String service, final String implementation) {
+		List<String> list = services.get(service);
+
+		if (list == null) {
+			list = new ArrayList<String>();
+			services.put(service, list);
+		}
+
+		list.add(implementation);
 	}
 
-	final Filer filer = processingEnv.getFiler();
+	private ClassElementVisitor classElement(final Element element) {
 
-	if (!services.isEmpty()) {
-	    messager.printMessage(Kind.NOTE, "Service Provider detected");
-	    for (final Map.Entry<String, List<String>> service : services.entrySet()) {
-		messager.printMessage(Kind.NOTE, "************************************");
-		final String serviceFile = service.getKey();
-		messager.printMessage(Kind.NOTE, "Interface : " + serviceFile);
+		final ClassElementVisitor elementVisitor = new ClassElementVisitor(processingEnv);
+		element.accept(elementVisitor, null);
+
+		return elementVisitor;
+	}
+
+	private Set<String> getAnnotationValues(final Element element) {
+		final Set<String> values = new HashSet<String>();
+
+		final ServiceLoader annotation = element.getAnnotation(ServiceLoader.class);
+
 		try {
-		    final FileObject fo = filer.createResource(StandardLocation.CLASS_OUTPUT, "", PREFIX + serviceFile);
-
-		    Writer openWriter = null;
-		    BufferedWriter bw = null;
-		    try {
-			openWriter = fo.openWriter();
-			bw = new BufferedWriter(openWriter);
-			final List<String> interfacesDeclare = service.getValue();
-			for (final String interfaceDeclare : interfacesDeclare) {
-			    messager.printMessage(Kind.NOTE, "                -> " + interfaceDeclare);
-			    bw.write(interfaceDeclare);
-			    bw.newLine();
+			annotation.value();
+		} catch (final MirroredTypesException mte) {
+			final List<? extends TypeMirror> typeMirrors = mte.getTypeMirrors();
+			for (TypeMirror typeMirror : typeMirrors) {
+				typeMirror = processingEnv.getTypeUtils().erasure(typeMirror);
+				final String inter = typeMirror.toString();
+				if (!"java.lang.Object".equals(inter)) {
+					values.add(inter);
+				}
 			}
-		    } finally {
-			if (bw != null) {
-			    bw.close();
-			}
-			if (openWriter != null) {
-			    openWriter.close();
-			}
-		    }
-
-		} catch (final IOException e) {
-		    throw new RuntimeException(e);
 		}
-	    }
+
+		return values;
 	}
-
-	return true;
-    }
-
-    private void addInterface(final String service, final String implementation) {
-	List<String> list = services.get(service);
-
-	if (list == null) {
-	    list = new ArrayList<String>();
-	    services.put(service, list);
-	}
-
-	list.add(implementation);
-    }
-
-    private Set<String> findInterfaces(final Element element) {
-
-	final ClassElementVisitor elementVisitor = new ClassElementVisitor(processingEnv);
-	element.accept(elementVisitor, null);
-
-	final Set<String> interfaces = elementVisitor.getInterfaces();
-
-	return interfaces;
-    }
-
-    private Set<String> getAnnotationValues(final Element element) {
-	final Set<String> values = new HashSet<String>();
-
-	final ServiceLoader annotation = element.getAnnotation(ServiceLoader.class);
-
-	try {
-	    annotation.value();
-	} catch (final MirroredTypesException mte) {
-	    final List<? extends TypeMirror> typeMirrors = mte.getTypeMirrors();
-	    for (TypeMirror typeMirror : typeMirrors) {
-		typeMirror = processingEnv.getTypeUtils().erasure(typeMirror);
-		final String inter = typeMirror.toString();
-		if (!"java.lang.Object".equals(inter)) {
-		    values.add(inter);
-		}
-	    }
-	}
-
-	return values;
-    }
 }
