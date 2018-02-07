@@ -76,25 +76,28 @@ public class ServiceLoaderProcessor extends AbstractProcessor {
 			final String impl = element.toString();
 			final ClassElementVisitor classElement = classElement(element);
 			final Set<String> findInterfaces = classElement.getInterfaces();
-			final Set<String> findSuperClasses = classElement.getSuperClasses();
+			final Set<String> abstractClasses = classElement.getAbstractClasses();
+			final Set<String> findInterfacesAndAbstractClasses = new HashSet<String>(findInterfaces);
+			findInterfacesAndAbstractClasses.addAll(abstractClasses);
+
 			final Set<String> annotationValues = getAnnotationValues(element);
 
-			if (findInterfaces != null && !findInterfaces.isEmpty()) {
+			if (findInterfacesAndAbstractClasses != null && !findInterfacesAndAbstractClasses.isEmpty()) {
 				if (annotationValues == null || annotationValues.isEmpty()) {
-					if (findInterfaces.size() == 1) {
-						addInterface(findInterfaces.iterator().next(), impl);
+					if (findInterfacesAndAbstractClasses.size() == 1) {
+						addServices(findInterfacesAndAbstractClasses.iterator().next(), impl);
 					} else {
 						messager.printMessage(Kind.ERROR, impl
-								+ " implements many interfaces, please define the interface in the ServiceProvider annotation");
+								+ " implements many interfaces or abstract classes, please define the interface or abstract class in the ServiceProvider annotation");
 						error = true;
 					}
 				} else {
 					for (final String annotationValue : annotationValues) {
-						if (findInterfaces.contains(annotationValue) || findSuperClasses.contains(annotationValue)) {
-							addInterface(annotationValue, impl);
+						if (findInterfacesAndAbstractClasses.contains(annotationValue)) {
+							addServices(annotationValue, impl);
 						} else {
 							messager.printMessage(Kind.ERROR, impl + " does not implement " + annotationValue
-									+ " interface defined in the ServiceProvider annotation");
+									+ " interface or abstract class defined in the ServiceProvider annotation");
 							error = true;
 						}
 					}
@@ -113,7 +116,7 @@ public class ServiceLoaderProcessor extends AbstractProcessor {
 			for (final Map.Entry<String, List<String>> service : services.entrySet()) {
 				messager.printMessage(Kind.NOTE, "************************************");
 				final String serviceFile = service.getKey();
-				messager.printMessage(Kind.NOTE, "Interface/SuperClass : " + serviceFile);
+				messager.printMessage(Kind.NOTE, "Interface/AbstractClass : " + serviceFile);
 				try {
 					final FileObject fo = filer.createResource(StandardLocation.CLASS_OUTPUT, "", PREFIX + serviceFile);
 
@@ -146,7 +149,7 @@ public class ServiceLoaderProcessor extends AbstractProcessor {
 		return true;
 	}
 
-	private void addInterface(final String service, final String implementation) {
+	private void addServices(final String service, final String implementation) {
 		List<String> list = services.get(service);
 
 		if (list == null) {

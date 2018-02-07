@@ -58,4 +58,8 @@ public class ClassTypeVisitor extends SimpleTypeVisitor6<Void, Void> {
 	public Set<String> getInterfaces() {
 		return elementVisitor.getInterfaces();
 	}
+
+	public Set<String> getAbstractClasses() {
+		return elementVisitor.getAbstractClasses();
+	}
 }

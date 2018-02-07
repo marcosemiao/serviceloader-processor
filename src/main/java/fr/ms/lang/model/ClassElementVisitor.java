@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.SimpleElementVisitor6;
@@ -40,7 +41,7 @@ public class ClassElementVisitor extends SimpleElementVisitor6<Void, Void> {
 
 	private final Set<String> interfaces = new HashSet<String>();
 
-	private final Set<String> superClasses = new HashSet<String>();
+	private final Set<String> abstractClasses = new HashSet<String>();
 
 	public ClassElementVisitor(final ProcessingEnvironment processingEnv) {
 		this.processingEnv = processingEnv;
@@ -64,14 +65,26 @@ public class ClassElementVisitor extends SimpleElementVisitor6<Void, Void> {
 			}
 		}
 
+		final Set<Modifier> modifiers = typeElement.getModifiers();
+		if (modifiers != null && !modifiers.isEmpty()) {
+			for (final Modifier modifier : modifiers) {
+				if (Modifier.ABSTRACT.equals(modifier)) {
+					abstractClasses.add(typeElement.toString());
+					break;
+				}
+			}
+		}
+
 		final TypeMirror superClassType = typeElement.getSuperclass();
 
 		if (superClassType != null && !"java.lang.Object".equals(superClassType.toString())) {
-			superClasses.add(superClassType.toString());
 			final ClassTypeVisitor typeVisitor = new ClassTypeVisitor(processingEnv);
 			superClassType.accept(typeVisitor, null);
 			final Set<String> superClassInterfaces = typeVisitor.getInterfaces();
 			interfaces.addAll(superClassInterfaces);
+
+			final Set<String> abstractClassesVisitor = typeVisitor.getAbstractClasses();
+			abstractClasses.addAll(abstractClassesVisitor);
 		}
 	}
 
@@ -79,7 +92,7 @@ public class ClassElementVisitor extends SimpleElementVisitor6<Void, Void> {
 		return Collections.unmodifiableSet(interfaces);
 	}
 
-	public Set<String> getSuperClasses() {
-		return Collections.unmodifiableSet(superClasses);
+	public Set<String> getAbstractClasses() {
+		return Collections.unmodifiableSet(abstractClasses);
 	}
 }
